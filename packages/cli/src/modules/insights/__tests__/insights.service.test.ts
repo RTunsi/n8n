@@ -644,6 +644,10 @@ describe('backgroundProcess', () => {
 		stopPruningTimer: jest.fn(),
 	} as unknown as InsightsPruningService;
 
+	const mockLogger = {
+		debug: jest.fn(),
+	} as unknown as Logger;
+
 	beforeAll(() => {
 		insightsService = new InsightsService(
 			mock<InsightsByPeriodRepository>(),
@@ -651,7 +655,7 @@ describe('backgroundProcess', () => {
 			mockCollectionService,
 			mockPruningService,
 			mock<License>(),
-			mock<Logger>(),
+			mockLogger,
 		);
 	});
 
@@ -663,6 +667,9 @@ describe('backgroundProcess', () => {
 		expect(mockCompactionService.startCompactionTimer).toHaveBeenCalled();
 		expect(mockCollectionService.startFlushingTimer).toHaveBeenCalled();
 		expect(mockPruningService.startPruningTimer).toHaveBeenCalled();
+		expect(mockLogger.debug).toHaveBeenCalledWith(
+			'Started compaction, flushing and pruning schedulers',
+		);
 	});
 
 	test('stopBackgroundProcess stops timers and logs message', () => {
@@ -673,5 +680,8 @@ describe('backgroundProcess', () => {
 		expect(mockCompactionService.stopCompactionTimer).toHaveBeenCalled();
 		expect(mockCollectionService.stopFlushingTimer).toHaveBeenCalled();
 		expect(mockPruningService.stopPruningTimer).toHaveBeenCalled();
+		expect(mockLogger.debug).toHaveBeenCalledWith(
+			'Stopped compaction, flushing and pruning schedulers',
+		);
 	});
 });
